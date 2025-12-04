@@ -2,86 +2,141 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .hover-shadow:hover { box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; transition: box-shadow 0.3s; }
+    </style>
 </head>
-<body class="bg-gray-100 p-8">
-    <div class="max-w-5xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">HR Interview Manager</h1>
+<body>
 
-        <div class="bg-white p-6 rounded shadow mb-8">
-            <h2 class="text-xl font-bold mb-4">Add New Question</h2>
-            <form method="POST" class="flex gap-4">
-                {% csrf_token %}
-                <input name="department" placeholder="Dept (e.g. IT)" class="border p-2 rounded w-1/4" required>
-                <input name="question" placeholder="Enter Question..." class="border p-2 rounded w-1/2" required>
-                <button type="submit" name="add_btn" class="bg-blue-600 text-white px-6 rounded font-bold">Save</button>
-            </form>
+    <div class="container py-5">
+        
+        <div class="mb-5 text-center text-md-start">
+            <h1 class="fw-bold text-dark">HR Interview Manager</h1>
+            <p class="text-secondary">Add questions and manually test AI grading</p>
         </div>
 
-        {% if analysis_result %}
-        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8 rounded shadow">
-            <h3 class="font-bold text-blue-900 text-xl mb-4">AI Analysis Report</h3>
-            
-            <div class="bg-white p-4 rounded mb-4">
-                <p class="text-gray-500 text-sm uppercase font-bold">Question</p>
-                <p class="text-lg font-bold mb-2">{{ analysis_result.question }}</p>
-                <p class="text-gray-500 text-sm uppercase font-bold">Your Answer</p>
-                <p class="italic text-gray-700">"{{ analysis_result.user_answer }}"</p>
-            </div>
-
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <div class="bg-white p-4 rounded text-center shadow-sm">
-                    <span class="block text-gray-500 text-xs uppercase">Tech Score</span>
-                    <span class="block text-3xl font-bold text-blue-600">{{ analysis_result.data.score }}/10</span>
-                </div>
-                <div class="bg-white p-4 rounded text-center shadow-sm">
-                    <span class="block text-gray-500 text-xs uppercase">Tone</span>
-                    <span class="block text-xl font-bold text-purple-600">{{ analysis_result.data.confidence_tone }}</span>
-                </div>
-                <div class="bg-white p-4 rounded text-center shadow-sm">
-                    <span class="block text-gray-500 text-xs uppercase">Communication</span>
-                    <span class="block text-xl font-bold text-green-600">{{ analysis_result.data.communication_rating }}</span>
-                </div>
-            </div>
-
-            <div class="bg-red-50 p-4 rounded border border-red-100">
-                <p class="text-red-800 font-bold"> Feedback: <span class="font-normal text-gray-800">{{ analysis_result.data.feedback }}</span></p>
-                <p class="text-green-800 font-bold mt-2"> Suggestion: <span class="font-normal text-gray-800">{{ analysis_result.data.suggestion }}</span></p>
-            </div>
-        </div>
-        {% endif %}
-
-        <h2 class="text-xl font-bold mb-4 text-gray-700">Question Bank (Test Mode)</h2>
-        <div class="space-y-4">
-            {% for q in questions %}
-            <div class="bg-white p-6 rounded shadow hover:shadow-md transition">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded font-bold">{{ q.department }}</span>
-                        <h3 class="text-lg font-bold mt-1">{{ q.text }}</h3>
-                    </div>
-                </div>
-
-                <form method="POST" class="mt-4 bg-gray-50 p-4 rounded border border-gray-200">
+        <div class="card shadow-sm mb-5">
+            <div class="card-body p-4">
+                <h4 class="card-title fw-bold mb-4 text-secondary">Add New Question</h4>
+                
+                <form method="POST" class="row g-3 align-items-center">
                     {% csrf_token %}
-                    <input type="hidden" name="question_id" value="{{ q.id }}">
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Test this question (Type an answer):</label>
                     
-                    <div class="flex gap-2">
-                        <input type="text" name="user_answer" placeholder="Type a sample answer here..." 
-                               class="flex-1 border p-2 rounded focus:outline-blue-500" required>
-                        <button type="submit" name="analyze_btn" 
-                                class="bg-green-600 text-white px-4 py-2 rounded font-bold hover:bg-green-700">
-                            Analyze
+                    <div class="col-12 col-md-3">
+                        <input type="text" name="department" class="form-control" placeholder="Dept (e.g. IT)" required>
+                    </div>
+                    
+                    <div class="col-12 col-md-7">
+                        <input type="text" name="question" class="form-control" placeholder="Enter Question Text..." required>
+                    </div>
+                    
+                    <div class="col-12 col-md-2">
+                        <button type="submit" name="add_btn" class="btn btn-primary w-100 fw-bold">
+                            Save Question
                         </button>
                     </div>
                 </form>
             </div>
+        </div>
+
+        {% if analysis_result %}
+        <div class="card shadow mb-5 border-0 border-start border-primary border-5 animate__animated animate__fadeIn">
+            <div class="card-body p-4">
+                <h3 class="card-title text-primary fw-bold mb-4">
+                    AI Analysis Report
+                </h3>
+                
+                <div class="bg-light p-3 rounded mb-4 border">
+                    <small class="text-uppercase text-secondary fw-bold">Question</small>
+                    <p class="fs-5 fw-bold text-dark mb-3">{{ analysis_result.question }}</p>
+                    
+                    <small class="text-uppercase text-secondary fw-bold">Your Answer</small>
+                    <div class="p-3 bg-white border rounded fst-italic text-secondary">
+                        "{{ analysis_result.user_answer }}"
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 rounded text-center border bg-primary bg-opacity-10 border-primary text-primary">
+                            <small class="fw-bold text-uppercase">Tech Score</small>
+                            <div class="display-6 fw-bold mt-1">{{ analysis_result.data.score }}/10</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 rounded text-center border bg-info bg-opacity-10 border-info text-info">
+                            <small class="fw-bold text-uppercase text-dark">Tone</small>
+                            <div class="h4 fw-bold mt-2 text-dark">{{ analysis_result.data.confidence_tone }}</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 rounded text-center border bg-success bg-opacity-10 border-success text-success">
+                            <small class="fw-bold text-uppercase">Communication</small>
+                            <div class="h4 fw-bold mt-2">{{ analysis_result.data.communication_rating }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger mb-2" role="alert">
+                    <strong>Feedback:</strong> {{ analysis_result.data.feedback }}
+                </div>
+                <div class="alert alert-success" role="alert">
+                    <strong>Suggestion:</strong> {{ analysis_result.data.suggestion }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <h4 class="fw-bold text-secondary border-bottom pb-2 mb-4">Question Bank (Test Mode)</h4>
+        
+        <div class="vstack gap-4">
+            {% for q in questions %}
+            <div class="card shadow-sm hover-shadow border-0">
+                <div class="card-body p-4">
+                    
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-secondary text-uppercase mb-2">{{ q.department }}</span>
+                            <h5 class="card-title fw-bold text-dark">{{ q.text }}</h5>
+                        </div>
+                        <small class="text-muted text-nowrap mt-2 mt-md-0">
+                            {{ q.created_at|date:"M d, Y" }}
+                        </small>
+                    </div>
+
+                    <div class="bg-light p-3 rounded border">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="question_id" value="{{ q.id }}">
+                            <label class="form-label text-uppercase text-secondary fw-bold" style="font-size: 0.75rem;">
+                                Test this question (Type an answer):
+                            </label>
+                            
+                            <div class="input-group">
+                                <input type="text" name="user_answer" class="form-control" placeholder="Type a sample answer here..." required>
+                                <button class="btn btn-success fw-bold px-4" type="submit" name="analyze_btn">
+                                    Analyze
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
             {% empty %}
-            <p class="text-gray-500 text-center py-8">No questions yet. Add one above!</p>
+            <div class="text-center py-5">
+                <p class="text-muted fs-5">No questions found.</p>
+                <p class="text-secondary small">Use the form above to add your first question.</p>
+            </div>
             {% endfor %}
         </div>
+
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
