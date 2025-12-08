@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="app-root">
       <div className="auth-container">
-        <h1 className="app-title">AI Interview – Auth</h1>
+        <h1 className="app-title">AI Interview</h1>
         <p className="app-subtitle">
           Sign up or login to access the AI interview platform.
         </p>
